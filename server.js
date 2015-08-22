@@ -8,7 +8,7 @@ var server = net.createServer(function (sock){
   sock.on('data', function (data){
     console.log('GET request received');
 
-    var home = '<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <title>The Elements</title> <link rel="stylesheet" href="/css/styles.css"> </head> <body> <h1>The Elements</h1> <h2>These are all the known elements.</h2> <h3>These are 2</h3> <ol> <li> <a href="/hydrogen">Hydrogen</a> </li> <li> <a href="/helium">Helium</a> </li> </ol> </body> </html>';
+    var home = '<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <title>The Elements</title> <link rel="stylesheet" href="/css/styles.css"> </head> <body> <h1>The Elements</h1> <h2>These are all the known elements.</h2> <h3>These are 2</h3> <ol> <li> <a href="/hydrogen.html">Hydrogen</a> </li> <li> <a href="/helium.html">Helium</a> </li> </ol> </body> </html>';
     var hydrogen = '<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <title>The Elements - Hydrogen</title> <link rel="stylesheet" href="/css/styles.css"> </head> <body> <h1>Hydrogen</h1> <h2>H</h2> <h3>Atomic number 1</h3> <p>Hydrogen is a chemical element with chemical symbol H and atomic number 1. With an atomic weight of 1.00794 u, hydrogen is the lightest element on the periodic table. Its monatomic form (H) is the most abundant chemical substance in the universe, constituting roughly 75% of all baryonic mass. Non-remnant stars are mainly composed of hydrogen in its plasma state. The most common isotope of hydrogen, termed protium (name rarely used, symbol 1H), has a single proton and zero neutrons.</p> <p><a href="/">back</a></p> </body> </html>';
     var helium = '<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <title>The Elements - Helium</title> <link rel="stylesheet" href="/css/styles.css"> </head> <body> <h1>Helium</h1> <h2>H</h2> <h3>Atomic number 2</h3> <p>Helium is a chemical element with symbol He and atomic number 2. It is a colorless, odorless, tasteless, non-toxic, inert, monatomic gas that heads the noble gas group in the periodic table. Its boiling and melting points are the lowest among all the elements and it exists only as a gas except in extremely cold conditions.</p> <p><a href="/">back</a></p> </body> </html>';
     var error = '<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <title>Element not found!</title> <link rel="stylesheet" href="/css/styles.css"> </head> <body> <h1>404</h1> <h2>Element not found!</h2> <p> <a href="/">back</a> </p> </body> </html>';
@@ -26,27 +26,53 @@ var server = net.createServer(function (sock){
     if (requestType === 'GET'){
       switch (URIrequest){
         case '/':
-          contentLength = home.length;
-          console.log('generating home area');
-          // genHead(requestType, contentLength);
-          sock.write(home);
+          sock.write(genHead(requestType, home.length));
+          sock.write('\n\n' + home);
           sock.end();
           break;
-        case '/hydrogen':
-          sock.write(hydrogen);
+        case '/hydrogen.html':
+          sock.write(genHead(requestType, hydrogen.length));
+          sock.write('\n\n' + hydrogen);
           sock.end();
           break;
-        case '/helium':
-          sock.write(helium);
+        case '/helium.html':
+          sock.write(genHead(requestType, helium.length));
+          sock.write('\n\n' + helium);
           sock.end();
           break;
         case '/css/styles.css':
-          sock.write(css);
+          sock.write('\n\n' + css);
           sock.end();
           break;
         default:
-          sock.write('nope');
+          sock.write(genHead('ERROR', error.length));
+          sock.write('\n\n' + error);
           sock.end();
+      }
+    }
+
+    if (requestType === 'HEAD'){
+      switch (URIrequest){
+        case '/':
+          sock.write(genHead(requestType, home.length));
+          sock.end();
+          break;
+        case '/hydrogen.html':
+          sock.write(genHead(requestType, hydrogen.length));
+          sock.end();
+          break;
+        case '/helium.html':
+          sock.write(genHead(requestType, helium.lenght));
+          sock.end();
+          break;
+        case '/css/styles.css':
+          sock.write(genHead(requestType, css.length));
+          sock.end();
+          break;
+        default:
+          sock.write(genHead('ERROR', error.length));
+          sock.end();
+          break;
       }
     }
 
@@ -64,22 +90,22 @@ server.listen(8080, function (){
   console.log('connected to ', server.address());
 });
 
-function genHead (statusCode, contentLength){
+function genHead (requestType, contentLength){
   var response = '';
-  switch (statusCode){
-    case 200:
-      response += 'HTTP/1.1 200 OK';
+  switch (requestType){
+    case 'GET':
+      response += 'HTTP/1.1 200 OK' + '\n';
       break;
-    case 404:
-      response += 'HTTP/1.1 404 Not Found';
-      break;
-    case 304:
-      response += 'HTTP/1.1 304 Not Modified';
+    case 'ERROR':
+      response += 'HTTP/1.1 404 Not Found' + '\n';
       break;
   }
-  response += 'Nakaz Server' + '\n';
+  response += 'Server: Nakaz Server' + '\n';
   response += 'Date: ' + new Date() + '\n';
   response += 'Content-Length: ' + contentLength + '\n';
+  response += 'Content-Type: text/html' + '\n';
+  response += 'charset=utf-8' + '\n';
+  response += 'Connection: keep-alive';
   console.log(response);
   return response;
 }
