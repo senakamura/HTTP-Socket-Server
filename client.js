@@ -8,12 +8,12 @@ var URI = '';
 for (var i = 2; i < process.argv.length; i++){
   var currentURL = process.argv[i];
   var checkProtocol = currentURL.split(/(\/\/)(?=\w)/g);
-  console.log(checkProtocol);
+  // console.log(checkProtocol);
   if (!checkProtocol[1]){
     currentURL = 'http://' + process.argv[i];
   }
 
-  console.log('this is current', currentURL);
+  console.log('URL is', currentURL);
 
   currentURLobj = url.parse(currentURL, true, true);
   console.log(currentURLobj);

@@ -1,3 +1,25 @@
+# How to use Client.js
+
+Enter in the command line:
+`node client.js yourlinkhere`
+
+Can in put url with `http://` or without.
+
+For Example:
+
+`http://www.devleague.com/` vs. `www.devleague.com`
+
+Will **ALWAYS** ouput with an `http://` protocol at beginning.
+
+Should get:
+
+1. `URL is (your url)`
+1. An object showing your protocols, paths, and etc.
+1. Console message saying your connecting.
+1. The GET request URI.
+1. Console message saying has received data.
+1. Disconnects from server.
+
 # HTTP Socket Server
 
 ## Basic http server accepting socket connections via net.Server
