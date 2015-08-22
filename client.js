@@ -7,8 +7,9 @@ var URI = '';
 
 for (var i = 2; i < process.argv.length; i++){
   var currentURL = process.argv[i];
-  var checkProtocol = currentURL.split('');
-  if (checkProtocol[6] !== '/'){
+  var checkProtocol = currentURL.split(/(\/\/)(?=\w)/g);
+  console.log(checkProtocol);
+  if (!checkProtocol[1]){
     currentURL = 'http://' + process.argv[i];
   }
 
@@ -33,7 +34,7 @@ client.setEncoding('utf8');
 
 client.on('data', function (data){
   console.log('RECEIVING THE DATA');
-  console.log(data);
+  // console.log(data);
   client.end();
 });
 
