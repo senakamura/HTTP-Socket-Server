@@ -1,13 +1,10 @@
 # How to use Client.js
 
-Enter in the command line:
-`node client.js yourlinkhere`
+Enter in the command line: `node client.js yourlinkhere`
 
 Can in put url with `http://` or without.
 
-For Example:
-
-`http://www.devleague.com/` vs. `www.devleague.com`
+For Example: `http://www.devleague.com/` vs. `www.devleague.com`
 
 Will **ALWAYS** ouput with an `http://` protocol at beginning.
 
