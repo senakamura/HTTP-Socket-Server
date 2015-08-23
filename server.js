@@ -1,44 +1,44 @@
 var net = require('net');
+var stream = require('stream');
 var fs = require('fs');
 
-var home = fs.readFileSync('index.html', 'utf8');
-var hydrogen = fs.readFileSync('hydrogen.html', 'utf8');
-var helium = fs.readFileSync('helium.html', 'utf8');
-var error = fs.readFileSync('404.html', 'utf8');
-
-var css = fs.readFileSync('css/styles.css', 'utf8');
+var Transform = stream.Transform;
 
 var server = net.createServer(function (sock){
+
   sock.setEncoding('utf8');
 
   console.log('client connected');
 
+
   sock.on('data', function (data){
     console.log('GET request received');
+    // console.log(data);
 
     var splitData = data.split('\n');
     var headData = splitData[0].split(' ');
     var requestType = headData[0];
     var URIrequest = headData[1];
 
+
+
     if (requestType === 'GET'){
       switch (URIrequest){
         case '/':
-          serveData(home, requestType);
+          combineHeadBody('index.html', requestType, sock);
           break;
         case '/hydrogen.html':
-          serveData(hydrogen, requestType);
+          combineHeadBody('hydrogen.html', requestType, sock);
           break;
         case '/helium.html':
-          serveData(helium, requestType);
+          combineHeadBody('helium.html', requestType, sock);
           break;
         case '/css/styles.css':
-          sock.write('\n\n' + css);
-          sock.end();
+          var css = fs.createReadStream('css/styles.css', 'utf8');
+          css.pipe(sock);
           break;
         default:
-          serveData(error, requestType);
-          sock.end();
+          combineHeadBody('404.html', requestType, sock);
       }
     }
 
@@ -66,24 +66,41 @@ var server = net.createServer(function (sock){
           break;
       }
     }
-    sock.end();
+
   });
 
   sock.on('end', function (){
     console.log('client disconnect');
+    console.log('===========================');
   });
 
-  function serveData (route, requestType){
-    sock.write(genHead(requestType, route.length));
-    sock.write('\n\n' + route);
-    sock.end();
-  }
+  sock.on('error', function (){
+    console.log('ERROR ERROR ERROR');
+  });
 
 });
 
 server.listen(8080, function (){
   console.log('connected to ', server.address());
 });
+
+function combineHeadBody(filename, requestType, sock){
+  var addHead = new Transform();
+
+  addHead._transform = function (chunk, enc, done){
+    console.log('transforming the data');
+    var string = genHead(requestType, chunk.length);
+    string += '\n\n' + chunk;
+    this.push(string);
+    done();
+  };
+
+  fs.createReadStream(filename, 'utf8')
+    .pipe(addHead)
+    .pipe(sock);
+}
+
+
 
 function genHead (requestType, contentLength){
   var response = '';
