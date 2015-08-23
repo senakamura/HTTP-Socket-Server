@@ -45,24 +45,19 @@ var server = net.createServer(function (sock){
     if (requestType === 'HEAD'){
       switch (URIrequest){
         case '/':
-          sock.write(genHead(requestType, home.length));
-          sock.end();
+          serveHeadOnly('index.html', requestType, sock);
           break;
         case '/hydrogen.html':
-          sock.write(genHead(requestType, hydrogen.length));
-          sock.end();
+          serveHeadOnly('hydrogen.html', requestType, sock);
           break;
         case '/helium.html':
-          sock.write(genHead(requestType, helium.lenght));
-          sock.end();
+          serveHeadOnly('helium.html', requestType, sock);
           break;
         case '/css/styles.css':
-          sock.write(genHead(requestType, css.length));
-          sock.end();
+          serveHeadOnly('/css/styles.css', requestType, sock);
           break;
         default:
-          sock.write(genHead('ERROR', error.length));
-          sock.end();
+          serveHeadOnly('404.html', requestType, sock);
           break;
       }
     }
@@ -100,6 +95,11 @@ function combineHeadBody(filename, requestType, sock){
     .pipe(sock);
 }
 
+function serveHeadOnly (file, requestType, sock){
+  var headerRes = genHead(requestType, file.length);
+  sock.write(headerRes);
+  sock.end();
+}
 
 
 function genHead (requestType, contentLength){
