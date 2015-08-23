@@ -24,27 +24,20 @@ var server = net.createServer(function (sock){
     if (requestType === 'GET'){
       switch (URIrequest){
         case '/':
-          sock.write(genHead(requestType, home.length));
-          sock.write('\n\n' + home);
-          sock.end();
+          serveData(home, requestType);
           break;
         case '/hydrogen.html':
-          sock.write(genHead(requestType, hydrogen.length));
-          sock.write('\n\n' + hydrogen);
-          sock.end();
+          serveData(hydrogen, requestType);
           break;
         case '/helium.html':
-          sock.write(genHead(requestType, helium.length));
-          sock.write('\n\n' + helium);
-          sock.end();
+          serveData(helium, requestType);
           break;
         case '/css/styles.css':
           sock.write('\n\n' + css);
           sock.end();
           break;
         default:
-          sock.write(genHead('ERROR', error.length));
-          sock.write('\n\n' + error);
+          serveData(error, requestType);
           sock.end();
       }
     }
@@ -80,6 +73,11 @@ var server = net.createServer(function (sock){
     console.log('client disconnect');
   });
 
+  function serveData (route, requestType){
+    sock.write(genHead(requestType, route.length));
+    sock.write('\n\n' + route);
+    sock.end();
+  }
 
 });
 
